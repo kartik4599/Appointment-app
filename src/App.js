@@ -15,6 +15,7 @@ function App() {
       try {
         const res = await axios.get("http://localhost:2000/");
         setData(res.data);
+        console.log(res.data);
       } catch (e) {
         console.log(e);
       }
@@ -25,9 +26,9 @@ function App() {
   const AddHandler = async () => {
     try {
       const sendData = {
-        name: nameref.current.value,
-        number: numberref.current.value,
-        email: mailref.current.value,
+        amount: nameref.current.value,
+        description: numberref.current.value,
+        category: mailref.current.value,
       };
       let res = await axios.post("/add", sendData);
       console.log(res);
@@ -41,24 +42,24 @@ function App() {
     setUpdate(true);
     setUpdateId(id);
     const currentItem = data.filter((e) => e.id === id);
-    nameref.current.value = currentItem[0].name;
-    numberref.current.value = currentItem[0].number;
-    mailref.current.value = currentItem[0].email;
+    nameref.current.value = currentItem[0].amount;
+    numberref.current.value = currentItem[0].description;
+    mailref.current.value = currentItem[0].category;
   };
 
   const updaterequest = async () => {
     const sendData = {
       id: updateID,
-      name: nameref.current.value,
-      number: numberref.current.value,
-      email: mailref.current.value,
+      amount: nameref.current.value,
+      description: numberref.current.value,
+      category: mailref.current.value,
     };
     const res = await axios.patch("/update", sendData);
     const newData = data.map((item) => {
       if (item.id === res.data.id) {
-        item.name = res.data.name;
-        item.email = res.data.email;
-        item.number = res.data.number;
+        item.amount = res.data.amount;
+        item.description = res.data.description;
+        item.category = res.data.category;
         return item;
       }
       return item;
@@ -76,31 +77,34 @@ function App() {
   return (
     <>
       <div className={style.container}>
-        <h2 className={style.Title}>Booking Appointment Site</h2>
+        <h2 className={style.Title}>Expense Tracker</h2>
         <div>
           <div className={style.row}>
-            <label>Name</label>
+            <label>Amount</label>
             <input
               ref={nameref}
-              type={"text"}
-              placeholder={"Enter your full name"}
+              type={"number"}
+              placeholder={"Enter Amount in $ "}
             />
           </div>
           <div className={style.row}>
-            <label>Phone Number</label>
+            <label>Description</label>
             <input
               ref={numberref}
-              type={"tel"}
-              placeholder={"Enter your mobile number"}
+              type={"text"}
+              placeholder={"Enter the description"}
             />
           </div>
           <div className={style.row}>
-            <label>Phone Number</label>
-            <input
-              ref={mailref}
-              type={"email"}
-              placeholder={"Enter your email id"}
-            />
+            <label>Category</label>
+            <input ref={mailref} list="catrgory" id="choose" />
+            <datalist id="catrgory">
+              <option value="House"></option>
+              <option value="Electricity"></option>
+              <option value="Office"></option>
+              <option value="Family"></option>
+              <option value="Entertainment"></option>
+            </datalist>
           </div>
           <div className={style.row}>
             {!update && <button onClick={AddHandler}>Add</button>}
@@ -121,8 +125,9 @@ function App() {
           {data.map((e) => {
             return (
               <div key={e.id} className={style.datarow}>
-                <h3>{e.name}</h3>
-                <span>{e.email}</span>
+                <h3>${e.amount}</h3>
+                <h4 className={style.expense}>{e.description}</h4>
+                <span className={style.category}>{e.category}</span>
                 <button onClick={updatehandler.bind(null, e.id)}>Update</button>
                 <button onClick={deletehandler.bind(null, e.id)}>Delete</button>
               </div>
